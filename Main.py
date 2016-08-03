@@ -52,7 +52,7 @@ class Main_UI(QWidget):
         
         self.result = QTextEdit()
 
-        self.deviceID = QLabel('DeviceID')
+        self.deviceID = QLabel('Serial.No')
         self.deviceIDEdit = QLineEdit()
         #self.deviceIDEdit.setMaximumHeight(100)
         UI_Up_layout.addWidget(self.deviceID)
@@ -85,7 +85,7 @@ class Main_UI(QWidget):
                 self.StartThread()
             if item_name == 'ImageCheck':
                 self.getTestitem(item_name)
-                self.test_item = FirmwareCheck().FirmwareCheck()
+                self.test_item = FirmwareCheck.FirmwareCheck()
                 self.test_item.show()
                 self.StartThread()
 
