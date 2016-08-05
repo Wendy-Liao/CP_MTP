@@ -6,7 +6,8 @@ import threading
 import time
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import FirmwareCheck
+import FirmwareVersion
+import NAND
 
 class MyThread(QThread):
     trigger = pyqtSignal(str)
@@ -22,7 +23,6 @@ class MyThread(QThread):
         self.trigger.emit(self.item_name)
 
 class Main_UI(QWidget):
-
     def __init__(self, parent = None):
         super(Main_UI, self).__init__(parent)
         self.config = ConfigParser.ConfigParser()
@@ -33,7 +33,7 @@ class Main_UI(QWidget):
         #self.Connect()
         self.setGeometry(200, 100, 1000, 500)
         #self.showMaximized()
-        
+    
     def getTestList(self):
         self.config.read('testlist.config')
         for each_section in self.config.sections():
@@ -78,14 +78,14 @@ class Main_UI(QWidget):
         self.setLayout(UI_layout)
 
     def BtnActivity(self, item_name):
-            if item_name == 'FirmwareCheck':
+            if item_name == 'FirmwareVersion':
                 self.getTestitem(item_name)
-                self.test_item = FirmwareCheck.FirmwareCheck()
+                self.test_item = FirmwareVersion.FirmwareVersion()
                 self.test_item.show()
                 self.StartThread()
-            if item_name == 'ImageCheck':
+            if item_name == 'NAND':
                 self.getTestitem(item_name)
-                self.test_item = FirmwareCheck.FirmwareCheck()
+                self.test_item = NAND.NAND()
                 self.test_item.show()
                 self.StartThread()
 
@@ -102,9 +102,20 @@ class Main_UI(QWidget):
 
     def UpdateUI(self, item_name):
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        if(self.test_item.finished):
-            self.buttons[self.index].setStyleSheet("background-color: rgb(0, 255, 0)")
-            self.result.append(timestamp + ' Done %s test' %item_name)
+        if self.test_item.finished:    
+            if(self.test_item.returncode == 0):
+                if self.test_item.Pass:
+                    self.buttons[self.index].setStyleSheet("background-color: rgb(0, 255, 0)")
+                    self.result.append('Result:\n' + self.test_item.output)
+                    self.result.append(timestamp + ' Done %s test' %item_name)
+                else:
+                    self.buttons[self.index].setStyleSheet("background-color: rgb(255, 0, 0)")
+                    self.result.append('Result:\n' + self.test_item.output)
+                    self.result.append(timestamp + ' Done %s test' %item_name)
+            else:
+                self.result.append('Exception:\n' + self.test_item.err)
+                self.buttons[self.index].setStyleSheet("background-color: rgb(255, 0, 0)")
+                self.result.append(timestamp + ' Done %s test' %item_name)
         else:
             self.result.append(timestamp + ' Start %s test' %item_name)
             self.StartThread()
