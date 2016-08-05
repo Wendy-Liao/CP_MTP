@@ -7,7 +7,8 @@ import time
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import FirmwareVersion
-import NAND
+import NANDCheck
+
 
 class MyThread(QThread):
     trigger = pyqtSignal(str)
@@ -83,9 +84,9 @@ class Main_UI(QWidget):
                 self.test_item = FirmwareVersion.FirmwareVersion()
                 self.test_item.show()
                 self.StartThread()
-            if item_name == 'NAND':
+            if item_name == 'NANDCheck':
                 self.getTestitem(item_name)
-                self.test_item = NAND.NAND()
+                self.test_item = NANDCheck.NANDCheck()
                 self.test_item.show()
                 self.StartThread()
 
@@ -98,7 +99,7 @@ class Main_UI(QWidget):
         thread = MyThread(self)    
         thread.trigger.connect(self.UpdateUI) 
         thread.setup(self.item_name)            
-        thread.start()  
+        thread.start()
 
     def UpdateUI(self, item_name):
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
